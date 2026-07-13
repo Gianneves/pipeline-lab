@@ -22,7 +22,7 @@ jobs:
                 echo " == ESTRTUTURA DE DIRETÓRIOS E ARQUIVOS .github/workflows == "
                 ls -la .github/workflows
                 echo ""
-                echo " Total de workflows: ${ls -1 .github/workflows | wc -l} "
+                echo " Total de workflows: $(ls -1 .github/workflows | wc -l) "
 
             - name: Elementos obrigatórios do workflow
               run: |
@@ -38,7 +38,7 @@ jobs:
             - name: Variáveis e Contexto 
               run: |
                 echo " == VARIÁVEIS E CONTEXTO == "
-                echo " Variáveis env: ${ env.NODE_VERSION } "
+                echo " Variáveis env: ${{ env.NODE_VERSION }} "
                 echo " 1. env: Definição de variáveis de ambiente "
                 echo " 2. contextos: Acesso a informações do workflow, job, runner, etc. "
                 echo ""
