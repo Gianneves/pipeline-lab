@@ -1,29 +1,29 @@
 on:
   schedule:
-    - cron: '10 17 * * *'
+    - cron: '15 17 * * *'
   workflow_dispatch:
 
 jobs: 
-  encheduled-job:
+  scheduled-job: # Correção ortográfica de 'encheduled-job'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Obrigatório para baixar todo o histórico do Git
 
-      - name: informações do schedule
+      - name: Informações do schedule
         run: | 
-          echo "workflow disparando por schedule"
-          echo "data atual: $(date)"
-          echo "hora utc: $(date -u)"
-          echo "timezone: $(date +%Z)"
+          echo "Workflow disparado por schedule"
+          echo "Data atual local do runner: $(date)"
+          echo "Hora UTC: $(date -u)"
+          echo "Timezone: $(date +%Z)"
 
-      - name: relatório diário automatizado
+      - name: Relatório diário automatizado
         run: | 
-          echo "relatório diário automatizado"
+          echo "Relatório diário automatizado"
           echo "==============="
-          echo "total de commits: $(git rev-list --all --count)"
-          echo "contribuidores únicos: $(git shortlog -sn | wc -l)"
-          echo "último commit: $(git log -1 --pretty=format:'%h - $s (%an, $ar)')"
-
-        
+          echo "Total de commits: $(git rev-list --all --count)"
+          echo "Contribuidores únicos: $(git log --format='%an' | sort -u | wc -l)"
+          echo "Último commit: $(git log -1 --pretty=format:'%h - %s (%an, %ar)')" # Correção de '$s' para '%s'
