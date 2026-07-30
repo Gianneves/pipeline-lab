@@ -1,41 +1,29 @@
-name: "Estrutura de Diretórios e Arquivos"
-
-on: 
-  push:
-    branches: [ main ]
+on:
+  schedule:
+    - cron: '00 11 * * *'
   workflow_dispatch:
 
-env:
-  NODE_VERSION: '18'
-
-jobs:
-  demonstrar-estrutura:
-    name: "Demonstrar Estrutura Básica"
+jobs: 
+  encheduled-job:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
+      - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Mostrar estrutura .github/workflows
+      - name: informações do schedule
         run: | 
-          echo "=== Estrutura do diretório .github/workflows ==="
-          ls -la .github/workflows/
-          echo ""
-          echo "Total de workflows: $(ls -1 .github/workflows/*.y*ml 2>/dev/null | wc -l)"
+          echo "workflow disparando por schedule"
+          echo "data atual: $(date)"
+          echo "hora utc: $(date -u)"
+          echo "timezone: $(date +%Z)"
 
-      - name: elementos obrigatórios do workflow
-        run: |
-          echo "=== elementos obrigatórios ==="
-          echo "1. name: Nome do workflow"
-          echo "2. on: evento de trigger (push, workflow_dispatch)"
-          echo "3. jobs: Tarefas a executar"
+      - name: relatório diário automatizado
+        run: | 
+          echo "relatório diário automatizado"
+          echo "==============="
+          echo "total de commits: $(git rev-list --all --count)"
+          echo "contribuidores únicos: $(git shortlog -sn | wc -l)"
+          echo "último commit: $(git log -1 --pretty=format:'%h - $s (%an, $ar)')"
 
-      - name: variáveis e contextos
-        run: |
-          echo "=== variáveis e contextos ==="
-          echo "variáveis env:  ${{ env.NODE_VERSION }}"
-          echo "repositório: ${{ github.repository }}"
-          echo "branch: ${{ github.ref_name }}"
-          echo "actor: ${{ github.actor }}"
-
+        
