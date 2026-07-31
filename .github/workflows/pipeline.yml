@@ -1,29 +1,31 @@
-on:
-  schedule:
-    - cron: '15 17 * * *'
-  workflow_dispatch:
+name: Push Trigger Workflow
 
-jobs: 
-  scheduled-job: # Correção ortográfica de 'encheduled-job'
+on:
+  push:
+    branches:
+        - main
+        - develop
+    paths:
+      - 'src/**'
+      - 'README.md'
+
+jobs:
+  push-job:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Obrigatório para baixar todo o histórico do Git
 
-      - name: Informações do schedule
-        run: | 
-          echo "Workflow disparado por schedule"
-          echo "Data atual local do runner: $(date)"
-          echo "Hora UTC: $(date -u)"
-          echo "Timezone: $(date +%Z)"
+      - name: Informações do Push
+        run: |
+          echo "Workflow disparado por PUSH"
+          echo "Commit: ${{ github.sha }}"
+          echo "Autor: ${{ github.actor }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Repo: ${{ github.repository }}"
 
-      - name: Relatório diário automatizado
-        run: | 
-          echo "Relatório diário automatizado"
-          echo "==============="
-          echo "Total de commits: $(git rev-list --all --count)"
-          echo "Contribuidores únicos: $(git log --format='%an' | sort -u | wc -l)"
-          echo "Último commit: $(git log -1 --pretty=format:'%h - %s (%an, %ar)')" # Correção de '$s' para '%s'
+      - name: Listar arquivos modificados
+        run: |
+          echo "Arquivos no repo:"
+          ls -la
