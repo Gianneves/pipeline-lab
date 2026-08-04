@@ -1,66 +1,93 @@
-name: Demonstração de Variáveis de Ambiente
+name: Deploy Multi-Ambientes
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-# Variáveis de ambiente no nível do WORKFLOW
-env:
-  WORKFLOW_VAR: "Variável definida no nível do workflow"
-  AMBIENTE: "producao"
-  VERSAO_APP: "1.0.0"
+  workflow_dispatch:  # Permite execução manual para testar cada ambiente
 
 jobs:
-  demonstracao-variaveis:
+  # Job 1: Mostra as variáveis de repositório (compartilhadas)
+  mostrar-variaveis-repositorio:
     runs-on: ubuntu-latest
-
-    # Variáveis de ambiente no nível do JOB
-    env:
-      JOB_VAR: "Variável definida no nível do job"
-      USUARIO: "devops-user"
-
     steps:
-      - name: Exibir variáveis do workflow
+      - name: Exibir variáveis de repositório
         run: |
-          echo "=== Variáveis do Workflow ==="
-          echo "Variável WORKFLOW_VAR: ${{ env.WORKFLOW_VAR }}"
-          echo "Ambiente: ${{ env.AMBIENTE }}"
-          echo "Versão da aplicação: ${{ env.VERSAO_APP }}"
+          echo "=== VARIÁVEIS DE REPOSITÓRIO ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Timeout padrão: ${{ vars.DEFAULT_TIMEOUT }}"
+          echo "Versão do Node: ${{ vars.NODE_VERSION }}"
 
-      - name: Exibir variáveis do job
+  # Job 2: Deploy em Desenvolvimento
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: dev  # Usa o environment "dev"
+    steps:
+      - name: Configurar ambiente DEV
         run: |
-          echo "=== Variáveis do Job ==="
-          echo "Variável JOB_VAR: ${{ env.JOB_VAR }}"
-          echo "Usuário: ${{ env.USUARIO }}"
+          echo "=== DEPLOY EM DESENVOLVIMENTO ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIRONMENT }}"
+          echo "API URL: ${{ vars.API_URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
 
-      - name: Exibir variável do step
-        env:
-          STEP_VAR: "Variável definida no nível do step"
-          MENSAGEM: "Este é um exemplo prático!"
+      - name: Simular build para DEV
         run: |
-          echo "=== Variáveis do Step ==="
-          echo "Variável STEP_VAR: ${{ env.STEP_VAR }}"
-          echo "Mensagem: ${{ env.MENSAGEM }}"
+          echo "Compilando aplicação para ${{ vars.ENVIRONMENT }}..."
+          echo "URL de destino: ${{ vars.API_URL }}"
+          sleep 2
+          echo "Build concluído para DEV"
 
-      - name: Combinar variáveis de diferentes níveis
-        env:
-          STEP_ESPECIFICO: "step-value"
+  # Job 3: Deploy em Staging
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging  # Usa o environment "staging"
+    needs: deploy-dev     # Só executa após deploy-dev
+    steps:
+      - name: Configurar ambiente STAGING
         run: |
-          echo "=== Combinação de Variáveis ==="
-          echo "Workflow: ${{ env.WORKFLOW_VAR }}"
-          echo "Job: ${{ env.JOB_VAR }}"
-          echo "Step: ${{ env.STEP_ESPECIFICO }}"
-          echo "Todas acessíveis no mesmo contexto!"
+          echo "=== DEPLOY EM STAGING ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIRONMENT }}"
+          echo "API URL: ${{ vars.API_URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
 
-      - name: Usar variáveis em comandos práticos
-        env:
-          NOME_PROJETO: "lab-variaveis"
-          TIMESTAMP: "2025-01-13"
+      - name: Simular testes de integração
         run: |
-          echo "=== Exemplo Prático ==="
-          echo "Compilando projeto: ${{ env.NOME_PROJETO }}"
-          echo "Data de build: ${{ env.TIMESTAMP }}"
-          echo "Ambiente de deploy: ${{ env.AMBIENTE }}"
-          echo "Versão: ${{ env.VERSAO_APP }}"
+          echo "Executando testes em ${{ vars.ENVIRONMENT }}..."
+          echo "Endpoint: ${{ vars.API_URL }}/health"
+          sleep 2
+          echo "Testes aprovados em STAGING"
+
+  # Job 4: Deploy em Produção
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production  # Usa o environment "production"
+    needs: deploy-staging    # Só executa após deploy-staging
+    steps:
+      - name: Configurar ambiente PRODUCTION
+        run: |
+          echo "=== DEPLOY EM PRODUÇÃO ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIRONMENT }}"
+          echo "API URL: ${{ vars.API_URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
+
+      - name: Deploy em produção
+        run: |
+          echo "Realizando deploy em ${{ vars.ENVIRONMENT }}..."
+          echo "URL pública: ${{ vars.API_URL }}"
+          sleep 3
+          echo "Deploy em PRODUÇÃO concluído com sucesso!"
+
+      - name: Notificar equipe
+        run: |
+          echo "Enviando notificação de deploy para ${{ vars.API_URL }}"
+          echo "Versão implantada: ${{ vars.APP_NAME }} em ${{ vars.ENVIRONMENT }}"
